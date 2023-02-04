@@ -1,4 +1,4 @@
-import expressAsyncHandler from '../../node_modules/express-async-handler/index.js';
+import expressAsyncHandler from 'express-async-handler/index.js';
 import userModel from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
 import JsonWebToken from 'jsonwebtoken';

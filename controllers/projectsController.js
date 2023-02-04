@@ -1,4 +1,4 @@
-import expressAsyncHandler from '../../node_modules/express-async-handler/index.js';
+import expressAsyncHandler from 'express-async-handler/index.js';
 import projectModel from '../models/projectModel.js';
 export const getAllProjects = expressAsyncHandler(async (req, res) => {
     const allDocs = await projectModel.find({ owner: req.user.id }); //! Should it be 'req.user._id' ???

@@ -25,6 +25,9 @@ app.use(express.json());
 app.use("/api/projects", ProjectRouter);
 app.use("/api/user", UserRouter);
 app.use(errorHandler);
+app.use('/', (req, res) => {
+  res.send('BE is Connected!');
+})
 
 app.use((req, res: any, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
