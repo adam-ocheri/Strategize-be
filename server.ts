@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/api/projects", ProjectRouter);
 app.use("/api/user", UserRouter);
 app.use(errorHandler);
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send('BE is Connected!');
 })
 
