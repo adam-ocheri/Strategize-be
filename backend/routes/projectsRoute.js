@@ -3,7 +3,7 @@ import { getAllProjects, createNewProject, getProjectById, updateProjectById, de
 import { protectRoute } from '../middleware/authMiddleware.js';
 const router = express.Router();
 router.route("/")
-    .get(protectRoute, getAllProjects)
+    .get(getAllProjects)
     .post(protectRoute, createNewProject);
 router.route("/:id")
     .get(protectRoute, getProjectById)
