@@ -5,7 +5,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import cors from 'cors';
-//import mongodb from 'mongodb';
+import mongodb from 'mongodb';
 //fix Node's "path" to support ESModules instead of CJS.
 import * as url from 'url';
 const __filename = url.fileURLToPath(import.meta.url);
@@ -49,11 +49,11 @@ app.use((req, res, next) => {
 //     })
 // }
 //Start server
-// const client = new mongodb.MongoClient (process.env.MONGO_URI);
-// const dbName = 'strategizedb';
-// client.connect().then(() => {
-//       global.db = client.db(dbName);
-// })
-app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+const client = new mongodb.MongoClient(process.env.MONGO_URI);
+const dbName = 'strategizedb';
+client.connect().then(() => {
+    global.db = client.db(dbName);
+    app.listen(PORT, () => {
+        console.log(`Server is listening on port ${PORT}`);
+    });
 });
