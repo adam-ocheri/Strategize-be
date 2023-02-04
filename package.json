@@ -2,13 +2,11 @@
   "name": "strategize",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
-    "client": "npm start --prefix frontend/strategize",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "start": "node index.js",
+    "server": "nodemon index.js"
   },
   "engines": {
     "node": "16.x"
