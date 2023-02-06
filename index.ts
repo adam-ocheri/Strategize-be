@@ -1,34 +1,38 @@
 import express from 'express';
-import ProjectRouter from './routes/projectsRoute.js';
 import UserRouter from './routes/userRoute.js';
+import ProjectRouter from './routes/projectsRoute.js';
+import LTGRouter from './routes/LTGsRoute.js';
+import objectiveRouter from './routes/objectivesRoute.js';
+import taskRouter from './routes/tasksRoute.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import cors from 'cors'
-import path from 'path';
 import mongodb from 'mongodb';
-
-//fix Node's "path" to support ESModules instead of CJS.
-import * as url from 'url';
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 //setup
 dotenv.config();
 connectDB();
 const PORT : any = process.env.PORT || 4000;
 const app  = express();
-//! exclude frontend/ from git ignore, and push to 2 separate repositories, with the folder directory to have the BE and FE resource available locally ("./")
+
+//routing
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
-app.use("/api/projects", ProjectRouter);
 app.use("/api/user", UserRouter);
+app.use("/api/projects", ProjectRouter);
+app.use("/api/project/ltg", LTGRouter);
+app.use("/api/project/ltg/objective", objectiveRouter);
+app.use("/api/project/ltg/objective/task", taskRouter);
 app.use(errorHandler);
+
+//validation made simple
 app.get('/', (req, res) => {
   res.send('BE is Connected!');
 })
 
+//headers setup
 app.use((req, res: any, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -39,23 +43,7 @@ app.use((req, res: any, next) => {
     else next();
   });
 
-//Serve Frontend
-// if (process.env.NODE_ENV === 'production')
-// {
-//     app.use(express.static(path.join(__dirname, '../frontend/strategize/build')));
-//     app.get('*', (req, res) => {
-//         res.sendFile(
-//             path.resolve(__dirname, '../', 'frontend', 'strategize', 'build', 'index.html')
-//         );
-//     });
-// }
-// else{
-//     app.get('/', (req,res) => {
-//         res.send('Please set to production environment')
-//     })
-// }
-
-//Start server
+//connection to server and db
 const client = new mongodb.MongoClient (process.env.MONGO_URI);
 const dbName = 'strategizedb';
 client.connect().then(() => {
