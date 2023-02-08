@@ -4,15 +4,17 @@ import { protectRoute } from '../middleware/authMiddleware.js';
 
 const router : express.Router = express.Router();
 
-router.route("/all/:projectId")
-.get(protectRoute, getAllLTGs)
+//router.route("/all/:projectId")
+
 
 router.route("/")
-.post(protectRoute, createNewLTG)
+.get(protectRoute, getAllLTGs)
+.post(protectRoute, createNewLTG);
 
-router.route("/:id")
+router.route("/LTG/")
 .get(protectRoute, getLTGById)
+//router.route("/:id")
 .put(protectRoute, updateLTGById)
-.delete(protectRoute, deleteLTGById)
+.delete(protectRoute, deleteLTGById);
 
 export default router;

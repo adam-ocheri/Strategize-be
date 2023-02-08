@@ -4,15 +4,17 @@ import { protectRoute } from '../middleware/authMiddleware.js';
 
 const router : express.Router = express.Router();
 
-router.route("/all/:objectiveId")
-.get(protectRoute, getAllTasks)
+//router.route("/all/:owningObjective")
+
 
 router.route("/")
-.post(protectRoute, createNewTask)
+.get(protectRoute, getAllTasks)
+.post(protectRoute, createNewTask);
 
-router.route("/:id")
+router.route("/task")
 .get(protectRoute, getTaskById)
+//router.route("/:id")
 .put(protectRoute, updateTaskById)
-.delete(protectRoute, deleteTaskById)
+.delete(protectRoute, deleteTaskById);
 
 export default router;

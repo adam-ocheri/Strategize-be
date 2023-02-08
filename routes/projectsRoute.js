@@ -5,7 +5,7 @@ const router = express.Router();
 router.route("/")
     .get(protectRoute, getAllProjects)
     .post(protectRoute, createNewProject);
-router.route("/:id")
+router.route("/project")
     .get(protectRoute, getProjectById)
     .put(protectRoute, updateProjectById)
     .delete(protectRoute, deleteProjectById);

@@ -11,7 +11,7 @@ export const getAllTasks : RequestHandler = expressAsyncHandler(async (req: Requ
     //* res.json(allDocs);
 
     const allDocs : any = await taskModel.find({
-        owningObjective: req.params.objectiveId /*or req.body.owningObjective */
+        owningObjective: req.query.owningObjective /*or req.body.owningObjective */
         /*,memberId: req.user._id - to ensure user is a member of this station*/
     }); 
     console.log(allDocs);
@@ -20,15 +20,15 @@ export const getAllTasks : RequestHandler = expressAsyncHandler(async (req: Requ
 
 //Create new (POST)
 export const createNewTask : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
-    if (!req.body.owningObjective || !req.body.owner || !req.body.taskName) {
+    if ( !req.body.taskName || !req.query.owningObjective || !req.query.owner || req.query.owner !== req.user._id ) {
         res.status(400);
         console.log('fields are missing in the Task Create request!');
         throw new Error('fields are missing in the Task Create request!');
     }
 
     const newTask : mongoose.Document = await taskModel.create({
-        owningObjective: req.body.owningObjective, 
-        owner: req.user.id, 
+        owningObjective: req.query.owningObjective, 
+        owner: req.user._id, 
         taskName: req.body.taskName
     }); 
     res.json(newTask);
@@ -36,14 +36,14 @@ export const createNewTask : RequestHandler = expressAsyncHandler(async (req : a
 
 //Retrieve by ID (GET)
 export const getTaskById : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
-    if (!req.params.id){
+    if (!req.query.id || !req.query.owningObjective){
         res.status(400);
         throw new Error('Can not retrieve document! request FAILED')
     }
 
     const task : any = await taskModel.findOne({
-        _id: req.params.id, 
-        owningObjective: req.params.objectiveId
+        _id: req.query.id, 
+        owningObjective: req.query.owningObjective
         /*,memberId: req.user._id - to ensure user is a member of this station*/
     }); 
     console.log(task);
@@ -51,17 +51,17 @@ export const getTaskById : RequestHandler = expressAsyncHandler(async (req : any
 })
 
 export const updateTaskById : RequestHandler = expressAsyncHandler(async (req : Request | any, res : Response) => {
-    if (!req.params.id){
+    if (!req.query.id || !req.query.owningObjective){
         res.status(400);
-        throw new Error('Can not retrieve document! request FAILED')
+        throw new Error('Can not retrieve document!Please supply query params! request FAILED')
     }
 
     //if (Objective.owningProject.ProjectSettings.bAllowMembersChanges == false)
     if (true){ // Private
         const task : any = await taskModel.findOneAndUpdate({
-            _id: req.params.id, 
+            _id: req.query.id, 
             owner: req.user._id, 
-            owningObjective: req.body.owningObjective
+            owningObjective: req.query.owningObjective
         }, req.body); 
         console.log(task);
         res.json(task);
@@ -78,8 +78,13 @@ export const updateTaskById : RequestHandler = expressAsyncHandler(async (req : 
 })
 
 export const deleteTaskById : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {
+    if (!req.query.id || !req.query.owningObjective){
+        res.status(400);
+        throw new Error('Can not retrieve document!Please supply query params! request FAILED')
+    }
     const task : any = await taskModel.findOneAndDelete({
-        _id: req.params.id, 
+        _id: req.query.id,
+        owningObjective: req.query.owningObjective, 
         owner: req.user._id
     }); 
     console.log(task);

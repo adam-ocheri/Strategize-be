@@ -11,7 +11,7 @@ interface IProject {
     data: string;
 
     //critical data
-    stationType : 'Project';
+    stationType : 'Project ';
     stationTypeName : string,
     projectName : string,
     projectIconImg : string

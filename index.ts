@@ -10,6 +10,12 @@ import { connectDB } from './config/db.js';
 import cors from 'cors'
 import mongodb from 'mongodb';
 
+/*
+    1. default
+    2. should I contain all substations as children of the project?
+    3. should I have 1 model and 1 collection for all stations types?
+*/
+
 //setup
 dotenv.config();
 connectDB();
@@ -22,9 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 app.use("/api/user", UserRouter);
 app.use("/api/projects", ProjectRouter);
-app.use("/api/project/ltg", LTGRouter);
-app.use("/api/project/ltg/objective", objectiveRouter);
-app.use("/api/project/ltg/objective/task", taskRouter);
+app.use("/api/project/ltgs", LTGRouter);
+app.use("/api/project/ltgs/objectives", objectiveRouter);
+app.use("/api/project/ltgs/objectives/tasks", taskRouter);
 app.use(errorHandler);
 
 //validation made simple
