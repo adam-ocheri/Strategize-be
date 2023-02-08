@@ -3,7 +3,7 @@ import expressAsyncHandler from 'express-async-handler/index.js';
 import mongoose from 'mongoose';
 import projectModel from '../models/projectModel.js';
 
-
+//! ROUTE: api/projects
 export const getAllProjects : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
     const allDocs : any = await projectModel.find({owner: req.user._id}); 
     res.json(allDocs);
@@ -21,12 +21,17 @@ export const createNewProject : RequestHandler = expressAsyncHandler(async (req 
     res.json(newProject);
 })
 
+//! ROUTE: api/projects/project
 //Retrieve by ID (GET)
 export const getProjectById : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
     if (!req.query.id){
         res.status(400);
         throw new Error('Can not retrieve document! request FAILED')
     }
+
+    console.log('Logging Query.........');
+    console.log(req.query.id);
+    console.log(req.user._id);
 
     const project : any = await projectModel.findOne({_id: req.query.id, owner: req.user._id}); 
     console.log(project);
