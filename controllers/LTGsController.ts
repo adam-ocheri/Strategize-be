@@ -2,32 +2,41 @@ import { Request, RequestHandler, Response } from 'express';
 import expressAsyncHandler from 'express-async-handler/index.js';
 import mongoose from 'mongoose';
 import LTGModel from '../models/LTGModel.js';
+import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
 
 
 export const getAllLTGs : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
-    const allDocs : any = await LTGModel.find({owningProject: req.query.owningProject /*or req.body.owningLTG */}); 
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.owningProject, condition: '!req.query.owningProject', value: req.query.owningProject}
+    ]
+    verifyRequest(requirements, 'LTG/GetAll', req, res);
+
+    const allDocs : any = await LTGModel.find({owningProject: req.query.owningProject}); 
     console.log(allDocs);
     res.json(allDocs);
 });
 
 //Create new (POST)
 export const createNewLTG : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
-    if ( !req.body.LTGName || !req.query.owningProject || !req.query.owner || !req.query.owner !== req.user._id) {
-        res.status(400);
-        console.log('fields are missing in the LTG Create request!');
-        throw new Error('fields are missing in the LTG Create request!');
-    }
+    const requirements : RequestVerifier[] = [
+        {check: !req.body.LTGName,                           condition: '!req.body.LTGName',                 value: req.body.LTGName}, 
+        {check: !req.query.owningProject ,                   condition: '!req.query.owningProject' ,         value: req.query.owningProject}, 
+        {check: !req.query.owner,                            condition: '!req.query.owner' ,                 value: req.query.owner} , 
+        {check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id' , value: `${req.query.owner} !== ${req.user._id.toString()}`} 
+    ];
+    verifyRequest(requirements, 'LTG/Create', req, res );
 
     const newLTG : mongoose.Document = await LTGModel.create({owningProject: req.query.owningProject, owner: req.user._id, LTGName: req.body.LTGName}); 
-    res.json(newLTG);
+    res.status(201).json(newLTG);
 })
 
 //Retrieve by ID (GET)
 export const getLTGById : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
-    if (!req.query.id || !req.query.owningProject){
-        res.status(400);
-        throw new Error('Can not retrieve document! request FAILED')
-    }
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id, condition: '!req.query.id', value: req.query.id},
+        {check: !req.query.owningProject, condition: '!req.query.owningProject', value: req.query.owningProject},
+    ]
+    verifyRequest( requirements , 'LTG/GetById', req, res);
 
     const LTG : any = await LTGModel.findOne({
         _id: req.query.id, 
@@ -39,10 +48,11 @@ export const getLTGById : RequestHandler = expressAsyncHandler(async (req : any 
 })
 
 export const updateLTGById : RequestHandler = expressAsyncHandler(async (req : Request | any, res : Response) => {
-    if (!req.query.id || !req.query.owningProject){
-        res.status(400);
-        throw new Error('Can not retrieve document! request FAILED')
-    }
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id,              condition: '!req.query.id',            value: req.query.id},
+        {check: !req.query.owningProject,   condition: '!req.query.owningProject', value: req.query.owningProject},
+    ]
+    verifyRequest( requirements , 'LTG/UpdateById', req, res);
 
     //if (LTG.owningProject.ProjectSettings.bAllowMembersChanges == false)
     if (true){ // Private
@@ -67,8 +77,16 @@ export const updateLTGById : RequestHandler = expressAsyncHandler(async (req : R
 
 export const deleteLTGById : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {
     //if (req.user._id === project.owner) // For Admin mode
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id, condition: '!req.query.id', value: req.query.id},
+        {check: !req.query.owningProject, condition: '!req.query.owningProject', value: req.query.owningProject},
+        {check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id' , value: `${req.query.owner} !== ${req.user._id.toString()}`} 
+    ]
+    verifyRequest(requirements, 'LTG/DeleteById', req, res);
+
     const LTG : any = await LTGModel.findOneAndDelete({
         _id: req.query.id, 
+        owningProject: req.query.owningProject,
         owner: req.user._id
     }); 
     console.log(LTG);

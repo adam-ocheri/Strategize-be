@@ -2,6 +2,7 @@ import { Request, RequestHandler, Response } from 'express';
 import expressAsyncHandler from 'express-async-handler/index.js';
 import mongoose from 'mongoose';
 import objectiveModel from '../models/objectiveModel.js';
+import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
 
 
 export const getAllObjectives : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
@@ -9,6 +10,11 @@ export const getAllObjectives : RequestHandler = expressAsyncHandler(async (req:
     //* const allDocs : any = await objectiveModel.find({owner: req.user.id}); 
     //* console.log(allDocs);
     //* res.json(allDocs);
+
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.owningLTG, condition: '!req.query.owningLTG', value: req.query.owningLTG},
+    ]
+    verifyRequest(requirements, 'Objective/GetAll', req, res);
 
     const allDocs : any = await objectiveModel.find({
         owningLTG: req.query.owningLTG /*or req.body.owningLTG */
@@ -20,26 +26,29 @@ export const getAllObjectives : RequestHandler = expressAsyncHandler(async (req:
 
 //Create new (POST)
 export const createNewObjective : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
-    if (!req.body.objectiveName || !req.query.owningLTG || !req.query.owner || req.query.owner !== req.user.id ) {
-        res.status(400);
-        console.log('fields are missing in the Objective Create request!');
-        throw new Error('fields are missing in the Objective Create request!');
-    }
+    const requirements : RequestVerifier[] = [
+        {check: !req.body.objectiveName,                     condition: '!req.body.objectiveName',           value: req.body.objectiveName}, 
+        {check: !req.query.owningLTG ,                       condition: '!req.query.owningLTG' ,             value: req.query.owningLTG}, 
+        {check: !req.query.owner,                            condition: '!req.query.owner' ,                 value: req.query.owner} , 
+        {check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id' , value: `${req.query.owner} !== ${req.user._id.toString()}`} 
+    ];
+    verifyRequest(requirements, 'Objective/Create', req, res );
 
     const newObjective : mongoose.Document = await objectiveModel.create({
         owningLTG: req.query.owningLTG, 
         owner: req.user.id, 
         objectiveName: req.body.objectiveName
     }); 
-    res.json(newObjective);
+    res.status(201).json(newObjective);
 })
 
 //Retrieve by ID (GET)
 export const getObjectiveById : RequestHandler = expressAsyncHandler(async (req : any | Request, res : Response) => {
-    if (!req.query.id || !req.query.owningLTG){
-        res.status(400);
-        throw new Error('Can not retrieve document! request FAILED')
-    }
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id,        condition: '!req.query.id',        value: req.query.id},
+        {check: !req.query.owningLTG, condition: '!req.query.owningLTG', value: req.query.owningLTG},
+    ]
+    verifyRequest(requirements, 'Objective/GetById', req, res );
 
     const objective : any = await objectiveModel.findOne({
         _id: req.query.id, 
@@ -51,12 +60,13 @@ export const getObjectiveById : RequestHandler = expressAsyncHandler(async (req 
 })
 
 export const updateObjectiveById : RequestHandler = expressAsyncHandler(async (req : Request | any, res : Response) => {
-    if (!req.query.id){
-        res.status(400);
-        throw new Error('Can not retrieve document! request FAILED')
-    }
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id,        condition: '!req.query.id',        value: req.query.id},
+        {check: !req.query.owningLTG, condition: '!req.query.owningLTG', value: req.query.owningLTG},
+    ]
+    verifyRequest(requirements, 'Objective/UpdateById', req, res );
 
-    //if (LTG.owningProject.ProjectSettings.bAllowMembersChanges == false)
+    //if (LTG.owningLTG.ProjectSettings.bAllowMembersChanges == false)
     if (true){ // Private
         const objective : any = await objectiveModel.findOneAndUpdate({
             _id: req.query.id, 
@@ -68,7 +78,7 @@ export const updateObjectiveById : RequestHandler = expressAsyncHandler(async (r
     } else { // Public
         const objective : any = await objectiveModel.findOneAndUpdate({
             _id: req.query.id, 
-            owningProject: req.query.owningProject
+            owningLTG: req.query.owningLTG
             /*,memberId: req.user._id - to ensure user is a member of this station*/
         }, req.body); 
         console.log(objective);
@@ -78,6 +88,14 @@ export const updateObjectiveById : RequestHandler = expressAsyncHandler(async (r
 })
 
 export const deleteObjectiveById : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {
+    
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id,                               condition: '!req.query.id',                     value: req.query.id},
+        {check: !req.query.owningLTG,                        condition: '!req.query.owningLTG',              value: req.query.owningLTG},
+        {check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id' , value: `${req.query.owner} !== ${req.user._id.toString()}`}
+    ]
+    verifyRequest(requirements, 'Objective/GetById', req, res );
+
     const objective : any = await objectiveModel.findOneAndDelete({
         _id: req.query.id, 
         owner: req.user._id
