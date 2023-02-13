@@ -3,6 +3,8 @@ import expressAsyncHandler from 'express-async-handler/index.js';
 import mongoose from 'mongoose';
 import LTGModel from '../models/LTGModel.js';
 import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
+import objectiveModel from '../models/objectiveModel.js';
+import taskModel from '../models/taskModel.js';
 
 
 export const getAllLTGs : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
@@ -84,6 +86,19 @@ export const deleteLTGById : RequestHandler = expressAsyncHandler(async (req : R
     ]
     verifyRequest(requirements, 'LTG/DeleteById', req, res);
 
+    //!Delete all substations associated with this LTG
+    //Delete Objectives
+    const Objectives : any = await objectiveModel.find({owningLTG: req.query.id});
+    //Delete Tasks
+    for (let obj in Objectives){
+        const Tasks : any = await taskModel.find({owningObjective: Objectives[obj]._id});
+        console.log('Objective ID:' + Objectives[obj]._id);
+        await taskModel.deleteMany({owningObjective: Objectives[obj]._id})
+    }
+    await objectiveModel.deleteMany({owningLTG: req.query.id});
+    console.log('LTG ID:' + req.query.id);
+
+    //*Delete LTG
     const LTG : any = await LTGModel.findOneAndDelete({
         _id: req.query.id, 
         owningProject: req.query.owningProject,

@@ -1,6 +1,8 @@
 import expressAsyncHandler from 'express-async-handler/index.js';
 import LTGModel from '../models/LTGModel.js';
 import { verifyRequest } from '../middleware/requestVerifier.js';
+import objectiveModel from '../models/objectiveModel.js';
+import taskModel from '../models/taskModel.js';
 export const getAllLTGs = expressAsyncHandler(async (req, res) => {
     const requirements = [
         { check: !req.query.owningProject, condition: '!req.query.owningProject', value: req.query.owningProject }
@@ -71,6 +73,18 @@ export const deleteLTGById = expressAsyncHandler(async (req, res) => {
         { check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id', value: `${req.query.owner} !== ${req.user._id.toString()}` }
     ];
     verifyRequest(requirements, 'LTG/DeleteById', req, res);
+    //!Delete all substations associated with this LTG
+    //Delete Objectives
+    const Objectives = await objectiveModel.find({ owningLTG: req.query.id });
+    //Delete Tasks
+    for (let obj in Objectives) {
+        const Tasks = await taskModel.find({ owningObjective: Objectives[obj]._id });
+        console.log('Objective ID:' + Objectives[obj]._id);
+        await taskModel.deleteMany({ owningObjective: Objectives[obj]._id });
+    }
+    await objectiveModel.deleteMany({ owningLTG: req.query.id });
+    console.log('LTG ID:' + req.query.id);
+    //*Delete LTG
     const LTG = await LTGModel.findOneAndDelete({
         _id: req.query.id,
         owningProject: req.query.owningProject,
