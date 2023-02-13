@@ -3,6 +3,7 @@ import expressAsyncHandler from 'express-async-handler/index.js';
 import mongoose from 'mongoose';
 import objectiveModel from '../models/objectiveModel.js';
 import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
+import taskModel from '../models/taskModel.js';
 
 
 export const getAllObjectives : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
@@ -37,7 +38,8 @@ export const createNewObjective : RequestHandler = expressAsyncHandler(async (re
     const newObjective : mongoose.Document = await objectiveModel.create({
         owningLTG: req.query.owningLTG, 
         owner: req.user.id, 
-        objectiveName: req.body.objectiveName
+        objectiveName: req.body.objectiveName,
+        stationType: 'Objective'
     }); 
     res.status(201).json(newObjective);
 })
@@ -96,6 +98,12 @@ export const deleteObjectiveById : RequestHandler = expressAsyncHandler(async (r
     ]
     verifyRequest(requirements, 'Objective/GetById', req, res );
 
+    //!Delete all sub-stations associated with this Objective!
+    //Delete Tasks
+    const Tasks : any = await taskModel.find({owningObjective: req.query.id});
+    console.log('Objective ID:' + req.query.id);
+    await taskModel.deleteMany({owningObjective: req.query.id})
+    //*Delete Objective
     const objective : any = await objectiveModel.findOneAndDelete({
         _id: req.query.id, 
         owner: req.user._id

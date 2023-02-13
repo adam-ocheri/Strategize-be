@@ -28,7 +28,11 @@ export const createNewLTG : RequestHandler = expressAsyncHandler(async (req : an
     ];
     verifyRequest(requirements, 'LTG/Create', req, res );
 
-    const newLTG : mongoose.Document = await LTGModel.create({owningProject: req.query.owningProject, owner: req.user._id, LTGName: req.body.LTGName}); 
+    const newLTG : mongoose.Document = await LTGModel.create({
+        owningProject: req.query.owningProject, 
+        owner: req.user._id, 
+        LTGName: req.body.LTGName, 
+        stationType: 'Long Term Goal'}); 
     res.status(201).json(newLTG);
 })
 

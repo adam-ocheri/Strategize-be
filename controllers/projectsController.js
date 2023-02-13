@@ -15,7 +15,11 @@ export const createNewProject = expressAsyncHandler(async (req, res) => {
         { check: !req.body.projectName, condition: '!req.body.projectName', value: req.body.projectName },
     ];
     verifyRequest(requirements, 'Project/Create', req, res);
-    const newProject = await projectModel.create({ projectName: req.body.projectName, owner: req.user.id });
+    const newProject = await projectModel.create({
+        projectName: req.body.projectName,
+        owner: req.user.id,
+        stationType: 'Project'
+    });
     res.status(201).json(newProject);
 });
 //! ROUTE: api/projects/project

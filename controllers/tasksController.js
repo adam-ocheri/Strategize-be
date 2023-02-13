@@ -29,7 +29,8 @@ export const createNewTask = expressAsyncHandler(async (req, res) => {
     const newTask = await taskModel.create({
         owningObjective: req.query.owningObjective,
         owner: req.user._id,
-        taskName: req.body.taskName
+        taskName: req.body.taskName,
+        stationType: 'Task'
     });
     res.json(newTask);
 });

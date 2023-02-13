@@ -1,6 +1,7 @@
 import expressAsyncHandler from 'express-async-handler/index.js';
 import objectiveModel from '../models/objectiveModel.js';
 import { verifyRequest } from '../middleware/requestVerifier.js';
+import taskModel from '../models/taskModel.js';
 export const getAllObjectives = expressAsyncHandler(async (req, res) => {
     //!If Private?
     //* const allDocs : any = await objectiveModel.find({owner: req.user.id}); 
@@ -29,7 +30,8 @@ export const createNewObjective = expressAsyncHandler(async (req, res) => {
     const newObjective = await objectiveModel.create({
         owningLTG: req.query.owningLTG,
         owner: req.user.id,
-        objectiveName: req.body.objectiveName
+        objectiveName: req.body.objectiveName,
+        stationType: 'Objective'
     });
     res.status(201).json(newObjective);
 });
@@ -81,6 +83,12 @@ export const deleteObjectiveById = expressAsyncHandler(async (req, res) => {
         { check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id', value: `${req.query.owner} !== ${req.user._id.toString()}` }
     ];
     verifyRequest(requirements, 'Objective/GetById', req, res);
+    //!Delete all sub-stations associated with this Objective!
+    //Delete Tasks
+    const Tasks = await taskModel.find({ owningObjective: req.query.id });
+    console.log('Objective ID:' + req.query.id);
+    await taskModel.deleteMany({ owningObjective: req.query.id });
+    //*Delete Objective
     const objective = await objectiveModel.findOneAndDelete({
         _id: req.query.id,
         owner: req.user._id

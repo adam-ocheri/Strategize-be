@@ -20,7 +20,10 @@ export const createNewProject : RequestHandler = expressAsyncHandler(async (req 
     ]
     verifyRequest(requirements, 'Project/Create', req, res);
 
-    const newProject : mongoose.Document = await projectModel.create({projectName: req.body.projectName, owner: req.user.id}); 
+    const newProject : mongoose.Document = await projectModel.create({
+        projectName: req.body.projectName, 
+        owner: req.user.id, 
+        stationType: 'Project'}); 
     res.status(201).json(newProject);
 })
 

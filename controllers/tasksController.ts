@@ -36,7 +36,8 @@ export const createNewTask : RequestHandler = expressAsyncHandler(async (req : a
     const newTask : mongoose.Document = await taskModel.create({
         owningObjective: req.query.owningObjective, 
         owner: req.user._id, 
-        taskName: req.body.taskName
+        taskName: req.body.taskName,
+        stationType: 'Task'
     }); 
     res.json(newTask);
 })

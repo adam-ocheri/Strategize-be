@@ -21,7 +21,12 @@ export const createNewLTG = expressAsyncHandler(async (req, res) => {
         { check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id', value: `${req.query.owner} !== ${req.user._id.toString()}` }
     ];
     verifyRequest(requirements, 'LTG/Create', req, res);
-    const newLTG = await LTGModel.create({ owningProject: req.query.owningProject, owner: req.user._id, LTGName: req.body.LTGName });
+    const newLTG = await LTGModel.create({
+        owningProject: req.query.owningProject,
+        owner: req.user._id,
+        LTGName: req.body.LTGName,
+        stationType: 'Long Term Goal'
+    });
     res.status(201).json(newLTG);
 });
 //Retrieve by ID (GET)
