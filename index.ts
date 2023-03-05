@@ -47,7 +47,7 @@ app.use((req, res: any, next) => {
     // Pass to next layer of middleware
     if (req.method === 'OPTIONS') res.sendStatus(200);
     else next();
-  });
+});
 
 //connection to server and db
 const client = new mongodb.MongoClient (process.env.MONGO_URI);

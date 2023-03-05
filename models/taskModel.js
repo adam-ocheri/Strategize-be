@@ -27,6 +27,9 @@ const modelSchema = new mongoose.Schema({
     },
     description: {
         type: String
+    },
+    date: {
+        type: String
     }
 }, {
     timestamps: true

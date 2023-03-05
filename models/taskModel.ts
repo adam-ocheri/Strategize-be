@@ -11,6 +11,7 @@ interface ITask {
     owningObjective : mongoose.Schema.Types.ObjectId,
     taskName : string,
     members : mongoose.Schema.Types.ObjectId[],
+    date: string,
     currentlyActive  : boolean,
     objectiveCalendar : Date,
     description : string,
@@ -45,6 +46,9 @@ const modelSchema = new mongoose.Schema<ITask>({
         type: String
     },
     description: {
+        type: String
+    },
+    date: {
         type: String
     }
 }, {
