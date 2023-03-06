@@ -111,3 +111,25 @@ export const deleteLTGById : RequestHandler = expressAsyncHandler(async (req : R
     console.log(LTG);
     res.json(LTG);
 })
+
+export const getAllTasks_LTG : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {
+    //if (req.user._id === project.owner) // For Admin mode
+    
+    const requirements : RequestVerifier[] = [
+        {check: !req.query.id, condition: '!req.query.id', value: req.query.id},
+        {check: !req.query.owningProject, condition: '!req.query.owningProject', value: req.query.owningProject},
+        {check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id' , value: `${req.query.owner} !== ${req.user._id.toString()}`} 
+    ]
+    verifyRequest(requirements, 'LTG/GetAllTasks', req, res);
+
+    const Objectives : any = await objectiveModel.find({owningLTG: req.query.id});
+    const allTasks = [];
+
+    for (let obj in Objectives){
+        const Tasks : any = await taskModel.find({owningObjective: Objectives[obj]._id});
+        allTasks.push(...Tasks)
+        console.log('Objective ID:' + Objectives[obj]._id);
+    }
+
+    res.json(allTasks);
+})
