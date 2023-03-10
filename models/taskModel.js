@@ -30,6 +30,12 @@ const modelSchema = new mongoose.Schema({
     },
     date: {
         type: String
+    },
+    iteration: {
+        type: Number
+    },
+    HISTORY_TaskIterations: {
+        type: []
     }
 }, {
     timestamps: true

@@ -16,6 +16,7 @@ interface ITask {
     objectiveCalendar : Date,
     description : string,
     Notes : string[],
+    iteration : number,
     HISTORY_TaskIterations : []
 }
 
@@ -50,6 +51,12 @@ const modelSchema = new mongoose.Schema<ITask>({
     },
     date: {
         type: String
+    },
+    iteration :{
+        type: Number
+    },
+    HISTORY_TaskIterations : {
+        type: []
     }
 }, {
     timestamps: true   
