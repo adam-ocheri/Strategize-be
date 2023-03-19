@@ -32,6 +32,7 @@ export const createNewTask = expressAsyncHandler(async (req, res) => {
         taskName: req.body.taskName,
         date: req.body.date,
         stationType: 'Task',
+        iteration: 0,
         HISTORY_TaskIterations: []
     });
     res.json(newTask);
