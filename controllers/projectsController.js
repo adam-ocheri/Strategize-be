@@ -84,12 +84,18 @@ export const getAllTasks_Project = expressAsyncHandler(async (req, res) => {
     const allTasks = [];
     const LTGs = await LTGModel.find({ owningProject: req.query.id });
     //Delete Objectives
+    if (!LTGs) {
+        return;
+    }
     for (let LTG in LTGs) {
         const Objectives = await objectiveModel.find({ owningLTG: LTGs[LTG]._id });
+        if (!Objectives) {
+            return;
+        }
         //Delete Tasks
         for (let obj in Objectives) {
             const Tasks = await taskModel.find({ owningObjective: Objectives[obj]._id });
-            allTasks.push(...Tasks);
+            Tasks ?? allTasks.push(...Tasks);
         }
     }
     res.json(allTasks);
