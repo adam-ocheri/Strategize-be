@@ -17,7 +17,8 @@ interface ITask {
     description : string,
     Notes : string[],
     iteration : number,
-    HISTORY_TaskIterations : []
+    HISTORY_TaskIterations : [],
+    heritage: {}
 }
 
 const modelSchema = new mongoose.Schema<ITask>({
@@ -57,6 +58,9 @@ const modelSchema = new mongoose.Schema<ITask>({
     },
     HISTORY_TaskIterations : {
         type: []
+    },
+    heritage: {
+        type: Object
     }
 }, {
     timestamps: true   

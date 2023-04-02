@@ -30,6 +30,7 @@ export const createNewTask = expressAsyncHandler(async (req, res) => {
         owningObjective: req.query.owningObjective,
         owner: req.user._id,
         taskName: req.body.taskName,
+        heritage: req.body.heritage,
         date: req.body.date,
         stationType: 'Task',
         iteration: 0,

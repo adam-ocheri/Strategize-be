@@ -103,22 +103,47 @@ export const getAllTasks_Project : RequestHandler = expressAsyncHandler(async (r
     
     const LTGs : any = await LTGModel.find({owningProject: req.query.id});
 
-    //Delete Objectives
-    if(!LTGs){
-        return;
-    }
+    //Get Objectives
     for (let LTG in LTGs){
         const Objectives : any = await objectiveModel.find({owningLTG: LTGs[LTG]._id});
-        if(!Objectives){
-            return;
-        }
         
-        //Delete Tasks
+        //Get Tasks
         for (let obj in Objectives){
             const Tasks : any = await taskModel.find({owningObjective: Objectives[obj]._id});
-            Tasks ?? allTasks.push(...Tasks);
+            allTasks.push(...Tasks);
         }
         
     }
+    res.json(allTasks);
+})
+
+export const getAllProjectsAndTasks : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {
+    console.log('TRYING TO GET ALLLLLLLLLLLLLLLLLLLLLLLLLLLL TASKSSS OF THE USER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    
+    const requirements : RequestVerifier[] = [
+        {check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id' , value: `${req.query.owner} !== ${req.user._id.toString()}`}
+    ]
+    verifyRequest(requirements, 'Project/GetAllProjectsAndTasks', req, res);
+
+    const Projects : any = await projectModel.find({owner: req.user._id}); //Get only MY projects - not the ones I am a member of
+
+    const allTasks = [];
+    
+    for (let project of Projects){
+        const LTGs : any = await LTGModel.find({owningProject: project._id});
+
+        //Get Objectives
+        for (let LTG in LTGs){
+            const Objectives : any = await objectiveModel.find({owningLTG: LTGs[LTG]._id});
+            
+            //Get Tasks
+            for (let obj in Objectives){
+                const Tasks : any = await taskModel.find({owningObjective: Objectives[obj]._id});
+                allTasks.push(...Tasks);
+            }
+            
+        }
+    }
+
     res.json(allTasks);
 })

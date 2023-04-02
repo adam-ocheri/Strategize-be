@@ -36,6 +36,9 @@ const modelSchema = new mongoose.Schema({
     },
     HISTORY_TaskIterations: {
         type: []
+    },
+    heritage: {
+        type: Object
     }
 }, {
     timestamps: true
