@@ -72,6 +72,7 @@ export const updateTaskById : RequestHandler = expressAsyncHandler(async (req : 
 
     //if (Objective.owningProject.ProjectSettings.bAllowMembersChanges == false)
     if (true){ // Private
+        // Update Task
         const task : any = await taskModel.findOneAndUpdate({
             _id: req.query.id, 
             owner: req.user._id, 
@@ -80,6 +81,8 @@ export const updateTaskById : RequestHandler = expressAsyncHandler(async (req : 
         console.log('BE LOG: Updating Task');
         console.log('body', req.body)
         console.log(task);
+
+        // Return Updated Task
         const Task : any = await taskModel.findOne({
             _id: req.query.id, 
             owner: req.user._id, 
