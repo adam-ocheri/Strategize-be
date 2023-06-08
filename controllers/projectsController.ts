@@ -117,6 +117,7 @@ export const getAllTasks_Project : RequestHandler = expressAsyncHandler(async (r
     res.json(allTasks);
 })
 
+
 export const getAllProjectsAndTasks : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {
     console.log('TRYING TO GET ALLLLLLLLLLLLLLLLLLLLLLLLLLLL TASKSSS OF THE USER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     

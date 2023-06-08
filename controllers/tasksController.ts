@@ -68,7 +68,7 @@ export const updateTaskById : RequestHandler = expressAsyncHandler(async (req : 
         {check: !req.query.id, condition: '!req.query.id', value: req.query.id},
         {check: !req.query.owningObjective, condition: '!req.query.owningObjective', value: req.query.owningObjective},
     ]
-    verifyRequest(requirements, 'Task/GetById', req, res );
+    verifyRequest(requirements, 'Task/UpdateById', req, res );
 
     //if (Objective.owningProject.ProjectSettings.bAllowMembersChanges == false)
     if (true){ // Private
@@ -77,8 +77,17 @@ export const updateTaskById : RequestHandler = expressAsyncHandler(async (req : 
             owner: req.user._id, 
             owningObjective: req.query.owningObjective
         }, req.body); 
+        console.log('BE LOG: Updating Task');
+        console.log('body', req.body)
         console.log(task);
-        res.json(task);
+        const Task : any = await taskModel.findOne({
+            _id: req.query.id, 
+            owner: req.user._id, 
+            owningObjective: req.query.owningObjective
+        }); 
+        console.log('Task Updated');
+        console.log(Task);
+        res.json(Task);
     } else { // Public
         const task : any = await taskModel.findOneAndUpdate({
             _id: req.params.id, 

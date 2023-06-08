@@ -16,6 +16,7 @@ router.route("/project")
 router.route("/project/all")
 .get(protectRoute, getAllTasks_Project)
 
+
 router.route("/alltasks")
 .get(protectRoute, getAllProjectsAndTasks)
 
