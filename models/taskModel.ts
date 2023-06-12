@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 interface ITask {
     //TODO : Should conceive these functions elsewhere
-    //*GetSelfRole() : string ['Admin' | 'Member']
+    //*GetSelfRole() : string ['Admin' | 'Member' | ?'Observer']
 
     owner: mongoose.Schema.Types.ObjectId;
     stationType : 'Task';
@@ -12,10 +12,12 @@ interface ITask {
     taskName : string,
     members : mongoose.Schema.Types.ObjectId[],
     date: string,
+    endTime: string,
+    notes : string,
+    goalAchieved: boolean,
     currentlyActive  : boolean,
     objectiveCalendar : Date,
     description : string,
-    Notes : string[],
     iteration : number,
     HISTORY_TaskIterations : [],
     heritage: {}
@@ -51,6 +53,15 @@ const modelSchema = new mongoose.Schema<ITask>({
         type: String
     },
     date: {
+        type: String
+    },
+    endTime: {
+        type: String
+    },
+    goalAchieved: {
+        type : Boolean
+    },
+    notes: {
         type: String
     },
     iteration :{

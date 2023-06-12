@@ -31,6 +31,15 @@ const modelSchema = new mongoose.Schema({
     date: {
         type: String
     },
+    endTime: {
+        type: String
+    },
+    goalAchieved: {
+        type: Boolean
+    },
+    notes: {
+        type: String
+    },
     iteration: {
         type: Number
     },
