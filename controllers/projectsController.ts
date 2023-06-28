@@ -53,7 +53,21 @@ export const updateProjectById : RequestHandler = expressAsyncHandler(async (req
     projectModel.findByIdAndUpdate({}, {})
     const project : any = await projectModel.findOneAndUpdate({_id: req.query.id, owner: req.user._id}, req.body); 
     console.log(project);
-    res.json(project);
+
+    if(req.body.projectName) {
+        const LTGs = await LTGModel.find({owningProject: project._id});
+        for (let ltg of LTGs){
+
+            const objectives = await objectiveModel.find({owningLTG: ltg._id});   
+            for (let objective of objectives) {
+                const Tasks : any = await taskModel.find({owningObjective: objective._id});
+                for (let task of Tasks){
+                    await taskModel.findByIdAndUpdate(task._id, {heritage: {...task.heritage, project: {...task.heritage.project, name : req.body.projectName}}});
+                }
+            } 
+        }
+    }
+        res.json(project);
 })
 
 export const deleteProjectById : RequestHandler = expressAsyncHandler(async (req : Request | any , res : Response) => {

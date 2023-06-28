@@ -68,6 +68,17 @@ export const updateLTGById : RequestHandler = expressAsyncHandler(async (req : R
             owningProject: req.query.owningProject
         }, req.body); 
         console.log(LTG);
+
+        if (req.body.LTGName){
+            const objectives = await objectiveModel.find({owningLTG: req.query.id});   
+            for (let objective of objectives){
+                const Tasks : any = await taskModel.find({owningObjective: objective._id});
+                for (let task of Tasks){
+                    await taskModel.findByIdAndUpdate(task._id, {heritage: {...task.heritage, ltg: {...task.heritage.ltg, name : req.body.LTGName}}});
+                }
+            }   
+        }
+
         res.json(LTG);
     } else { // Public
         const LTG : any = await LTGModel.findOneAndUpdate({

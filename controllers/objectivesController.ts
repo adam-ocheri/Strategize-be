@@ -70,12 +70,33 @@ export const updateObjectiveById : RequestHandler = expressAsyncHandler(async (r
 
     //if (LTG.owningLTG.ProjectSettings.bAllowMembersChanges == false)
     if (true){ // Private
+        
         const objective : any = await objectiveModel.findOneAndUpdate({
             _id: req.query.id, 
             owner: req.user._id, 
             owningLTG: req.query.owningLTG
         }, req.body); 
         console.log(objective);
+
+        // Valid - but slow:
+        if(req.body.objectiveName){
+            const Tasks : any = await taskModel.find({owningObjective: req.query.id});
+            for (let task of Tasks){
+                await taskModel.findByIdAndUpdate(task._id, {heritage: {...task.heritage, objective: {...task.heritage.objective, name : req.body.objectiveName}}});
+            }
+        }
+            
+        // Should be faster and more efficient:
+        // const filter = { $where: `this.owningObjective === ${objective._id}`};
+        // await taskModel.updateMany(filter, {$set: {heritage: {objective: {name :req.body.objectiveName}}}}, (error, result) => {
+        //     if (error){
+        //         console.error(error);
+        //     }
+        //     else{
+        //         console.log(`${result.nModified} documents modified`)
+        //     }
+        // })
+
         res.json(objective);
     } else { // Public
         const objective : any = await objectiveModel.findOneAndUpdate({
