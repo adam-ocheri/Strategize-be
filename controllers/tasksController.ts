@@ -3,6 +3,9 @@ import expressAsyncHandler from 'express-async-handler/index.js';
 import mongoose from 'mongoose';
 import taskModel from '../models/taskModel.js';
 import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
+import objectiveModel from '../models/objectiveModel.js';
+import LTGModel from '../models/LTGModel.js';
+import projectModel from '../models/projectModel.js';
 
 
 export const getAllTasks : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
@@ -33,6 +36,14 @@ export const createNewTask : RequestHandler = expressAsyncHandler(async (req : a
     ];
     verifyRequest(requirements, 'Task/Create', req, res );
 
+    const objective = await objectiveModel.findById(req.query.owningObjective);
+    const LTG = await LTGModel.findById(objective.owningLTG);
+    const project = await projectModel.findById(LTG.owningProject);
+
+    const stationTypeName : string = (objective.defaults.taskStation_TypeName == "Task" ? 
+        (LTG.defaults.taskStation_TypeName == "Task" ? project.defaults.taskStation_TypeName : LTG.defaults.taskStation_TypeName) :
+        objective.defaults.taskStation_TypeName) 
+         
     const newTask : mongoose.Document = await taskModel.create({
         owningObjective: req.query.owningObjective, 
         owner: req.user._id,
@@ -42,7 +53,9 @@ export const createNewTask : RequestHandler = expressAsyncHandler(async (req : a
         endTime: req.body.date,
         stationType: 'Task',
         iteration : 0,
-        HISTORY_TaskIterations: []
+        HISTORY_TaskIterations: [],
+        goalAchieved : false,
+        stationTypeName
     }); 
     res.json(newTask);
 })

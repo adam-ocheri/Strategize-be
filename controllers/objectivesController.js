@@ -2,6 +2,8 @@ import expressAsyncHandler from 'express-async-handler/index.js';
 import objectiveModel from '../models/objectiveModel.js';
 import { verifyRequest } from '../middleware/requestVerifier.js';
 import taskModel from '../models/taskModel.js';
+import projectModel from '../models/projectModel.js';
+import LTGModel from '../models/LTGModel.js';
 export const getAllObjectives = expressAsyncHandler(async (req, res) => {
     //!If Private?
     //* const allDocs : any = await objectiveModel.find({owner: req.user.id}); 
@@ -27,11 +29,17 @@ export const createNewObjective = expressAsyncHandler(async (req, res) => {
         { check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id', value: `${req.query.owner} !== ${req.user._id.toString()}` }
     ];
     verifyRequest(requirements, 'Objective/Create', req, res);
+    const LTG = await LTGModel.findById(req.query.owningLTG);
+    const project = await projectModel.findById(LTG.owningProject);
+    const stationTypeName = LTG?.defaults?.objStation_TypeName ? (LTG.defaults.objStation_TypeName == "Objective" ?
+        project.defaults.objStation_TypeName :
+        LTG.defaults.objStation_TypeName) : project.defaults.objStation_TypeName;
     const newObjective = await objectiveModel.create({
         owningLTG: req.query.owningLTG,
         owner: req.user.id,
         objectiveName: req.body.objectiveName,
-        stationType: 'Objective'
+        stationType: 'Objective',
+        stationTypeName
     });
     res.status(201).json(newObjective);
 });

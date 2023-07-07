@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+interface IDefaults {
+    ltgStation_TypeName: string;
+    objStation_TypeName: string;
+    taskStation_TypeName: string;
+}
 
 interface IProject {
     //TODO : Should conceive these functions elsewhere
@@ -21,6 +26,7 @@ interface IProject {
     description : string,
     Notes : string[],
     HISTORY_LTGsAchieved : []
+    defaults: IDefaults
 }
 
 const modelSchema = new mongoose.Schema<IProject>({
@@ -46,6 +52,9 @@ const modelSchema = new mongoose.Schema<IProject>({
     },
     description: {
         type: String
+    },
+    defaults: {
+        type: Object
     }
 }, {
     timestamps: true   

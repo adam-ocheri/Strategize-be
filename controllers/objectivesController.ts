@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import objectiveModel from '../models/objectiveModel.js';
 import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
 import taskModel from '../models/taskModel.js';
+import projectModel from '../models/projectModel.js';
+import LTGModel from '../models/LTGModel.js';
 
 
 export const getAllObjectives : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
@@ -35,11 +37,19 @@ export const createNewObjective : RequestHandler = expressAsyncHandler(async (re
     ];
     verifyRequest(requirements, 'Objective/Create', req, res );
 
+    const LTG = await LTGModel.findById(req.query.owningLTG);
+    const project = await projectModel.findById(LTG.owningProject);
+
+    const stationTypeName = LTG?.defaults?.objStation_TypeName ? (LTG.defaults.objStation_TypeName == "Objective" ? 
+        project.defaults.objStation_TypeName : 
+        LTG.defaults.objStation_TypeName ) : project.defaults.objStation_TypeName;
+         
     const newObjective : mongoose.Document = await objectiveModel.create({
         owningLTG: req.query.owningLTG, 
         owner: req.user.id, 
         objectiveName: req.body.objectiveName,
-        stationType: 'Objective'
+        stationType: 'Objective',
+        stationTypeName
     }); 
     res.status(201).json(newObjective);
 })
@@ -51,6 +61,7 @@ export const getObjectiveById : RequestHandler = expressAsyncHandler(async (req 
         {check: !req.query.owningLTG, condition: '!req.query.owningLTG', value: req.query.owningLTG},
     ]
     verifyRequest(requirements, 'Objective/GetById', req, res );
+
 
     const objective : any = await objectiveModel.findOne({
         _id: req.query.id, 

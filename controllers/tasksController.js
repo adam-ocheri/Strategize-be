@@ -1,6 +1,9 @@
 import expressAsyncHandler from 'express-async-handler/index.js';
 import taskModel from '../models/taskModel.js';
 import { verifyRequest } from '../middleware/requestVerifier.js';
+import objectiveModel from '../models/objectiveModel.js';
+import LTGModel from '../models/LTGModel.js';
+import projectModel from '../models/projectModel.js';
 export const getAllTasks = expressAsyncHandler(async (req, res) => {
     //!If Private?
     //* const allDocs : any = await taskModel.find({owner: req.user.id}); 
@@ -26,6 +29,12 @@ export const createNewTask = expressAsyncHandler(async (req, res) => {
         { check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id', value: `${req.query.owner} !== ${req.user._id.toString()}` }
     ];
     verifyRequest(requirements, 'Task/Create', req, res);
+    const objective = await objectiveModel.findById(req.query.owningObjective);
+    const LTG = await LTGModel.findById(objective.owningLTG);
+    const project = await projectModel.findById(LTG.owningProject);
+    const stationTypeName = (objective.defaults.taskStation_TypeName == "Task" ?
+        (LTG.defaults.taskStation_TypeName == "Task" ? project.defaults.taskStation_TypeName : LTG.defaults.taskStation_TypeName) :
+        objective.defaults.taskStation_TypeName);
     const newTask = await taskModel.create({
         owningObjective: req.query.owningObjective,
         owner: req.user._id,
@@ -35,7 +44,9 @@ export const createNewTask = expressAsyncHandler(async (req, res) => {
         endTime: req.body.date,
         stationType: 'Task',
         iteration: 0,
-        HISTORY_TaskIterations: []
+        HISTORY_TaskIterations: [],
+        goalAchieved: false,
+        stationTypeName
     });
     res.json(newTask);
 });

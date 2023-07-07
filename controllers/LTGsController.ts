@@ -5,6 +5,7 @@ import LTGModel from '../models/LTGModel.js';
 import { RequestVerifier, verifyRequest } from '../middleware/requestVerifier.js';
 import objectiveModel from '../models/objectiveModel.js';
 import taskModel from '../models/taskModel.js';
+import projectModel from '../models/projectModel.js';
 
 
 export const getAllLTGs : RequestHandler = expressAsyncHandler(async (req: Request | any, res: Response)  => { 
@@ -28,11 +29,16 @@ export const createNewLTG : RequestHandler = expressAsyncHandler(async (req : an
     ];
     verifyRequest(requirements, 'LTG/Create', req, res );
 
+    const project = await projectModel.findById(req.query.owningProject);
+
+
     const newLTG : mongoose.Document = await LTGModel.create({
         owningProject: req.query.owningProject, 
         owner: req.user._id, 
         LTGName: req.body.LTGName, 
-        stationType: 'Long Term Goal'}); 
+        stationType: 'Long Term Goal',
+        stationTypeName: project.defaults.ltgStation_TypeName
+    }); 
     res.status(201).json(newLTG);
 })
 

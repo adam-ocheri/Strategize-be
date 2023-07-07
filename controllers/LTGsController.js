@@ -3,6 +3,7 @@ import LTGModel from '../models/LTGModel.js';
 import { verifyRequest } from '../middleware/requestVerifier.js';
 import objectiveModel from '../models/objectiveModel.js';
 import taskModel from '../models/taskModel.js';
+import projectModel from '../models/projectModel.js';
 export const getAllLTGs = expressAsyncHandler(async (req, res) => {
     const requirements = [
         { check: !req.query.owningProject, condition: '!req.query.owningProject', value: req.query.owningProject }
@@ -21,11 +22,13 @@ export const createNewLTG = expressAsyncHandler(async (req, res) => {
         { check: req.query.owner !== req.user._id.toString(), condition: 'req.query.owner !== req.user._id', value: `${req.query.owner} !== ${req.user._id.toString()}` }
     ];
     verifyRequest(requirements, 'LTG/Create', req, res);
+    const project = await projectModel.findById(req.query.owningProject);
     const newLTG = await LTGModel.create({
         owningProject: req.query.owningProject,
         owner: req.user._id,
         LTGName: req.body.LTGName,
-        stationType: 'Long Term Goal'
+        stationType: 'Long Term Goal',
+        stationTypeName: project.defaults.ltgStation_TypeName
     });
     res.status(201).json(newLTG);
 });

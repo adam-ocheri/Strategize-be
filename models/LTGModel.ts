@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+interface IDefaults {
+    objStation_TypeName: string;
+    taskStation_TypeName: string;
+}
 
 interface ILTG {
     //TODO : Should conceive these functions elsewhere
@@ -20,7 +24,8 @@ interface ILTG {
     ltgCalendar : Date,
     description : string,
     Notes : string[],
-    HISTORY_ObjectivesAchieved : []
+    HISTORY_ObjectivesAchieved : [],
+    defaults: IDefaults
 }
 
 const modelSchema = new mongoose.Schema<ILTG>({
@@ -47,6 +52,9 @@ const modelSchema = new mongoose.Schema<ILTG>({
     },
     description: {
         type: String
+    },
+    defaults: {
+        type: Object
     }
 }, {
     timestamps: true   
