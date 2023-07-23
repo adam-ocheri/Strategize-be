@@ -68,7 +68,7 @@ export const getObjectiveById : RequestHandler = expressAsyncHandler(async (req 
         owningLTG: req.query.owningLTG
         /*,memberId: req.user._id - to ensure user is a member of this station*/
     }); 
-    console.log(objective);
+
     res.status(200).json(objective);
 })
 
