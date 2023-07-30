@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import JsonWebToken  from 'jsonwebtoken';
 
 //*For Development only:
-export const getter : RequestHandler = expressAsyncHandler(async(req: Request, res: Response) => {
+export const getAllUsers_DEV : RequestHandler = expressAsyncHandler(async(req: Request, res: Response) => {
     const allDocs : any = await userModel.find();
     res.json(allDocs);
 })
@@ -111,3 +111,24 @@ export const deleteUserById : RequestHandler = expressAsyncHandler(async (req : 
 const generateToken = (id) => {
     return JsonWebToken.sign( {id}, process.env.JWT_SECRET, {expiresIn: '30d'});
 }
+
+
+//!------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//!------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//!------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const updateStat : RequestHandler = expressAsyncHandler(async (req:Request, res:Response) => {
+    // const {email, password} = req.body;
+
+    const user : any = await userModel.findById({_id: req.params.id});
+
+    if(user)
+    {
+
+    }
+    else
+    {
+        res.status(400);
+        throw new Error('Invalid user data - user was not found');
+    }
+})

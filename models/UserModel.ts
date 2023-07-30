@@ -1,5 +1,26 @@
 import mongoose from "mongoose";
 
+interface IUsageTracking {
+    totalMinutes: number;
+    totalClicks: number;
+    totalRequests: number;
+}
+
+interface IDayStats {
+    date: string;
+    dayUsage: IUsageTracking
+}
+
+interface IHistory {
+    totalDaysSinceRegistered: number;
+    calendar: IDayStats[];
+}
+
+interface IUserStatistics {
+    usageTracking: IUsageTracking;
+    history: IHistory;
+}
+
 interface IUser {
     name: string;
     email: string;
