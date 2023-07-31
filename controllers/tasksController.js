@@ -32,9 +32,9 @@ export const createNewTask = expressAsyncHandler(async (req, res) => {
     const objective = await objectiveModel.findById(req.query.owningObjective);
     const LTG = await LTGModel.findById(objective.owningLTG);
     const project = await projectModel.findById(LTG.owningProject);
-    const stationTypeName = (objective.defaults.taskStation_TypeName == "Task" ?
-        (LTG.defaults.taskStation_TypeName == "Task" ? project.defaults.taskStation_TypeName : LTG.defaults.taskStation_TypeName) :
-        objective.defaults.taskStation_TypeName);
+    const stationTypeName = (objective?.defaults?.taskStation_TypeName == "Task" ?
+        (LTG?.defaults?.taskStation_TypeName == "Task" ? project?.defaults?.taskStation_TypeName : LTG?.defaults?.taskStation_TypeName) :
+        objective?.defaults?.taskStation_TypeName);
     const newTask = await taskModel.create({
         owningObjective: req.query.owningObjective,
         owner: req.user._id,

@@ -40,9 +40,9 @@ export const createNewTask : RequestHandler = expressAsyncHandler(async (req : a
     const LTG = await LTGModel.findById(objective.owningLTG);
     const project = await projectModel.findById(LTG.owningProject);
 
-    const stationTypeName : string = (objective.defaults.taskStation_TypeName == "Task" ? 
-        (LTG.defaults.taskStation_TypeName == "Task" ? project.defaults.taskStation_TypeName : LTG.defaults.taskStation_TypeName) :
-        objective.defaults.taskStation_TypeName) 
+    const stationTypeName : string = (objective?.defaults?.taskStation_TypeName == "Task" ? 
+        (LTG?.defaults?.taskStation_TypeName == "Task" ? project?.defaults?.taskStation_TypeName : LTG?.defaults?.taskStation_TypeName) :
+        objective?.defaults?.taskStation_TypeName) 
          
     const newTask : mongoose.Document = await taskModel.create({
         owningObjective: req.query.owningObjective, 
