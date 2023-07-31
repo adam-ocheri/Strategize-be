@@ -23,6 +23,7 @@ const app = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+<<<<<<< HEAD
 // app.get('/events', async function(req, res) {
 //   console.log('Got /events');
 //   res.set({
@@ -41,6 +42,26 @@ app.use(express.json());
 //     res.write(`data: ${count}\n\n`);
 //   }
 // });
+=======
+app.get('/events', async function (req, res) {
+    console.log('Got /events');
+    res.set({
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'text/event-stream',
+        'Connection': 'keep-alive'
+    });
+    res.flushHeaders();
+    // Tell the client to retry every 10 seconds if connectivity is lost
+    res.write('retry: 10000\n\n');
+    let count = 0;
+    while (true) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('Emit', ++count);
+        // Emit an SSE that contains the current 'count' as a string
+        res.write(`data: ${count}\n\n`);
+    }
+});
+>>>>>>> 34cd290b2cb664c0ddc7bddf89489e251a44b32b
 app.use("/api/user", UserRouter);
 app.use("/api/projects", ProjectRouter);
 app.use("/api/project/ltgs", LTGRouter);
@@ -56,7 +77,11 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Authorization');
+<<<<<<< HEAD
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+=======
+    res.setHeader('Access-Control-Allow-Credentials', true);
+>>>>>>> 34cd290b2cb664c0ddc7bddf89489e251a44b32b
     // Pass to next layer of middleware
     if (req.method === 'OPTIONS')
         res.sendStatus(200);

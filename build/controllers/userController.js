@@ -3,7 +3,11 @@ import userModel from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
 import JsonWebToken from 'jsonwebtoken';
 //*For Development only:
+<<<<<<< HEAD
 export const getAllUsers_DEV = expressAsyncHandler(async (req, res) => {
+=======
+export const getter = expressAsyncHandler(async (req, res) => {
+>>>>>>> 34cd290b2cb664c0ddc7bddf89489e251a44b32b
     const allDocs = await userModel.find();
     res.json(allDocs);
 });
@@ -87,6 +91,7 @@ export const deleteUserById = expressAsyncHandler(async (req, res) => {
 const generateToken = (id) => {
     return JsonWebToken.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
+<<<<<<< HEAD
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,3 +107,5 @@ export const updateStat = expressAsyncHandler(async (req, res) => {
         throw new Error('Invalid user data - user was not found');
     }
 });
+=======
+>>>>>>> 34cd290b2cb664c0ddc7bddf89489e251a44b32b

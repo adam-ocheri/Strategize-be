@@ -11,11 +11,6 @@ interface IDayStats {
     dayUsage: IUsageTracking
 }
 
-interface IHistory {
-    totalDaysWithoutActivity: number;
-    calendar: IDayStats[];
-}
-
 interface IGoalTracking {
     totalTasksCompletedOnTime: number;
     totalTasksCompletedOverdue: number;
@@ -25,7 +20,8 @@ interface IGoalTracking {
 interface IUserStatistics {
     usageTracking: IUsageTracking;
     goalTracking: IGoalTracking;
-    history: IHistory;
+    totalDaysSinceRegistered: number;
+    calendar: IDayStats[];
 }
 
 interface IUser {
