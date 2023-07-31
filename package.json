@@ -2,10 +2,10 @@
   "name": "strategize",
   "version": "1.0.0",
   "description": "",
-  "main": "build/index.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "rimraf ./build && npx tsc && node build/index.js",
+    "start": "node index.js",
     "server": "nodemon index.js",
     "client": "npm start --prefix ../FE",
     "dev": "concurrently \"npm run server\" \"npm run client\""
