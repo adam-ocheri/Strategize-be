@@ -7,7 +7,5 @@
         "lib": [ "dom", "es2017", "ESNext"],			// <= integrate intellisense, documentation and autocomplete features for libraries needed for a project
         "allowSyntheticDefaultImports":true,
         "moduleResolution": "node",
-
-        
     }
  }
