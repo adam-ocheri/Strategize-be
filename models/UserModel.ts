@@ -1,9 +1,38 @@
 import mongoose from "mongoose";
 
+interface IUsageTracking {
+    totalMinutes: number;
+    totalClicks: number;
+    totalRequests: number;
+}
+
+interface IDayStats {
+    date: string;
+    dayUsage: IUsageTracking
+}
+
+interface IHistory {
+    totalDaysWithoutActivity: number;
+    calendar: IDayStats[];
+}
+
+interface IGoalTracking {
+    totalTasksCompletedOnTime: number;
+    totalTasksCompletedOverdue: number;
+    totalTasksCompletedEarly: number;
+}
+
+interface IUserStatistics {
+    usageTracking: IUsageTracking;
+    goalTracking: IGoalTracking;
+    history: IHistory;
+}
+
 interface IUser {
     name: string;
     email: string;
     password: string;
+    userStatistics: IUserStatistics;
 }
 
 const modelSchema = new mongoose.Schema<IUser>({

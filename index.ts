@@ -27,27 +27,27 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 
-app.get('/events', async function(req, res) {
-  console.log('Got /events');
-  res.set({
-    'Cache-Control': 'no-cache',
-    'Content-Type': 'text/event-stream',
-    'Connection': 'keep-alive'
-  });
-  res.flushHeaders();
+// app.get('/events', async function(req, res) {
+//   console.log('Got /events');
+//   res.set({
+//     'Cache-Control': 'no-cache',
+//     'Content-Type': 'text/event-stream',
+//     'Connection': 'keep-alive'
+//   });
+//   res.flushHeaders();
 
-  // Tell the client to retry every 10 seconds if connectivity is lost
-  res.write('retry: 10000\n\n');
-  let count = 0;
+//   // Tell the client to retry every 10 seconds if connectivity is lost
+//   res.write('retry: 10000\n\n');
+//   let count = 0;
 
-  while (true) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+//   while (true) {
+//     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Emit', ++count);
-    // Emit an SSE that contains the current 'count' as a string
-    res.write(`data: ${count}\n\n`);
-  }
-});
+//     console.log('Emit', ++count);
+//     // Emit an SSE that contains the current 'count' as a string
+//     res.write(`data: ${count}\n\n`);
+//   }
+// });
 
 app.use("/api/user", UserRouter);
 app.use("/api/projects", ProjectRouter);
@@ -66,7 +66,7 @@ app.use((req, res: any, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     // Pass to next layer of middleware
     if (req.method === 'OPTIONS') res.sendStatus(200);
     else next();

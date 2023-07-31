@@ -1,11 +1,11 @@
 import express from 'express';
-import { createNewUser, loginExistingUser, getCurrentUser, getUserById, getter, updateUserById, deleteUserById } from '../controllers/userController.js';
+import { createNewUser, loginExistingUser, getCurrentUser, getUserById, getAllUsers_DEV, updateUserById, deleteUserById, updateStat } from '../controllers/userController.js';
 import { protectRoute } from '../middleware/authMiddleware.js';
 
 const router : express.Router = express.Router();
 
 router.route("/")
-.get(getter)
+.get(getAllUsers_DEV)
 
 //-----------------------------------------------------
 
@@ -23,6 +23,10 @@ router.route("/:id")
 .get(getUserById)
 .put(updateUserById)
 .delete(deleteUserById)
+
+//-----------------------------------------------------
+router.route("/stats")
+.patch(protectRoute, updateStat)
 
 //TODO: authentication and associate User with Projects
 

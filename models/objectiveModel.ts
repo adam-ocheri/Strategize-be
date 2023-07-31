@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 
+interface IDefaults {
+    taskStation_TypeName: string;
+}
 
 interface IObjective {
     //TODO : Should conceive these functions elsewhere
@@ -20,7 +23,8 @@ interface IObjective {
     objectiveCalendar : Date,
     description : string,
     Notes : string[],
-    HISTORY_TasksAchieved : []
+    HISTORY_TasksAchieved : [],
+    defaults: IDefaults
 }
 
 const modelSchema = new mongoose.Schema<IObjective>({
@@ -47,6 +51,9 @@ const modelSchema = new mongoose.Schema<IObjective>({
     },
     description: {
         type: String
+    },
+    defaults: {
+        type: Object
     }
 }, {
     timestamps: true   

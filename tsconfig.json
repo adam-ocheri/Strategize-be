@@ -1,13 +1,14 @@
 { 
     "compilerOptions": 
     {
-        "target" : "ESNext",				// <= target ES version ("ESNext" is latest)
-        "module": "esnext",
-        "watch" : true,				// <= enable/disable live compilation (disabled if not specified)
+        "target" : "ESNext",				        // <= target ES version ("ESNext" is latest)
+        "module": "ESNext",
         "lib": [ "dom", "es2017", "ESNext"],			// <= integrate intellisense, documentation and autocomplete features for libraries needed for a project
         "allowSyntheticDefaultImports":true,
         "moduleResolution": "node",
-
+        "rootDir": "./",
+        "outDir": "./build"
         
+        //"start": "rimraf ./build && npx tsc && node build/index.js",
     }
  }

@@ -23,7 +23,14 @@ export const createNewProject : RequestHandler = expressAsyncHandler(async (req 
     const newProject : mongoose.Document = await projectModel.create({
         projectName: req.body.projectName, 
         owner: req.user.id, 
-        stationType: 'Project'}); 
+        stationType: 'Project',
+        stationTypeName: 'Project',
+        defaults: {
+            ltgStation_TypeName: 'Long Term Goal',
+            objStation_TypeName: 'Objective',
+            taskStation_TypeName: 'Task'
+        }
+    }); 
     res.status(201).json(newProject);
 })
 
