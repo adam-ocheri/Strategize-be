@@ -123,13 +123,14 @@ const generateToken = (id) => {
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 export const updateStat = expressAsyncHandler(async (req, res) => {
-    // const {email, password} = req.body;
+    console.log('Stats Route is working!');
     const user = await userModel.findById({ _id: req.params.id });
     if (user) {
         const { stat, targetValue } = req.body;
         let statString = `userStatistics.${stat}.${targetValue}`;
         let doc = {};
         if (stat == 'usageTracking' || stat == 'goalTracking') {
+            console.log('STATS! :', { stat, targetValue });
             doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $inc: { statString: 1 } });
         }
         else if (stat == 'calendar') {

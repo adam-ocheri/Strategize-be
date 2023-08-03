@@ -29,7 +29,7 @@ interface IUser {
     name: string;
     email: string;
     password: string;
-    userStatistics: {};
+    userStatistics: IUserStatistics;
 }
 
 const modelSchema = new mongoose.Schema<IUser>({

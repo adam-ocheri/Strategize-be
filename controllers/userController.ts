@@ -151,7 +151,7 @@ const generateToken = (id) => {
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const updateStat : RequestHandler = expressAsyncHandler(async (req:Request, res:Response) => {
-    // const {email, password} = req.body;
+    console.log('Stats Route is working!');
 
     const user : any = await userModel.findById({_id: req.params.id});
 
@@ -163,6 +163,7 @@ export const updateStat : RequestHandler = expressAsyncHandler(async (req:Reques
         let doc : any = {};
 
         if (stat == 'usageTracking' || stat == 'goalTracking'){
+            console.log('STATS! :', {stat, targetValue})
             doc = await userModel.updateOne({$where: `this._id == ${req.params.id}`}, {$inc: {statString : 1}});
         }
         else if (stat == 'calendar') {
