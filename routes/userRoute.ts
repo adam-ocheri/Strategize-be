@@ -26,7 +26,7 @@ router.route("/:id")
 
 //-----------------------------------------------------
 router.route("/stats")
-.patch(protectRoute, updateStat)
+.put(protectRoute, updateStat)
 
 //TODO: authentication and associate User with Projects
 
