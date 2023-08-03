@@ -1,23 +1,24 @@
 import mongoose from "mongoose";
 
-interface IUsageTracking {
+export interface IUsageTracking {
     totalMinutes: number;
     totalClicks: number;
     totalRequests: number;
 }
 
-interface IDayStats {
+export interface IDayStats {
     date: string;
     dayUsage: IUsageTracking
+    goalTracking: IGoalTracking;
 }
 
-interface IGoalTracking {
+export interface IGoalTracking {
     totalTasksCompletedOnTime: number;
     totalTasksCompletedOverdue: number;
     totalTasksCompletedEarly: number;
 }
 
-interface IUserStatistics {
+export interface IUserStatistics {
     usageTracking: IUsageTracking;
     goalTracking: IGoalTracking;
     totalDaysSinceRegistered: number;
@@ -28,7 +29,7 @@ interface IUser {
     name: string;
     email: string;
     password: string;
-    userStatistics: IUserStatistics;
+    userStatistics: {};
 }
 
 const modelSchema = new mongoose.Schema<IUser>({
@@ -44,6 +45,10 @@ const modelSchema = new mongoose.Schema<IUser>({
     password: {
         type: String,
         required: [true, 'Password is mandatory']
+    },
+    userStatistics : {
+        type: Object,
+        required: [true, 'Must have user statistics initialized!']
     }
 }, {
     timestamps: true   

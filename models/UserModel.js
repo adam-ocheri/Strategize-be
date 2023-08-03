@@ -12,6 +12,10 @@ const modelSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Password is mandatory']
+    },
+    userStatistics: {
+        type: Object,
+        required: [true, 'Must have user statistics initialized!']
     }
 }, {
     timestamps: true

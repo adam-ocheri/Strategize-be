@@ -24,12 +24,44 @@ export const createNewUser = expressAsyncHandler(async (req, res) => {
     //encrypt the user's password
     const hashSalt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, hashSalt);
-    const newUser = await userModel.create({ name: name, email: email, password: hashedPassword });
+    const userStatistics = {
+        usageTracking: {
+            totalMinutes: 0,
+            totalClicks: 0,
+            totalRequests: 0
+        },
+        goalTracking: {
+            totalTasksCompletedOnTime: 0,
+            totalTasksCompletedOverdue: 0,
+            totalTasksCompletedEarly: 0
+        },
+        totalDaysSinceRegistered: 0,
+        calendar: [{
+                date: new Date().toString().slice(0, 15),
+                dayUsage: {
+                    totalMinutes: 0,
+                    totalClicks: 0,
+                    totalRequests: 0
+                },
+                goalTracking: {
+                    totalTasksCompletedOnTime: 0,
+                    totalTasksCompletedOverdue: 0,
+                    totalTasksCompletedEarly: 0
+                },
+            }]
+    };
+    const newUser = await userModel.create({
+        name: name,
+        email: email,
+        password: hashedPassword,
+        userStatistics: userStatistics
+    });
     if (newUser) {
         res.status(201).json({
             _id: newUser._id,
             name: newUser.name,
             email: newUser.email,
+            userStatistics: newUser.userStatistics,
             token: generateToken(newUser._id)
         });
     }
@@ -94,7 +126,55 @@ export const updateStat = expressAsyncHandler(async (req, res) => {
     // const {email, password} = req.body;
     const user = await userModel.findById({ _id: req.params.id });
     if (user) {
-        const doc = await userModel.findByIdAndUpdate({ _id: req.params.id }, req.body);
+        const { stat, targetValue } = req.body;
+        let statString = `userStatistics.${stat}.${targetValue}`;
+        let doc = {};
+        if (stat == 'usageTracking' || stat == 'goalTracking') {
+            doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $inc: { statString: 1 } });
+        }
+        else if (stat == 'calendar') {
+            const todayDate = new Date().toString().slice(0, 15);
+            let found = false;
+            let at = 0;
+            for (let dayIdx = 0; dayIdx < user.userStatistics.calendar.length; ++dayIdx) {
+                if (user.userStatistics.calendar[dayIdx].date == todayDate) {
+                    found = true;
+                    at = dayIdx;
+                    break;
+                }
+            }
+            if (found) {
+                statString = `userStatistics.${stat}.${at}.${targetValue}`;
+                doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $inc: { statString: 1 } });
+            }
+            else {
+                const newCalendarDay = {
+                    date: new Date().toString().slice(0, 15),
+                    dayUsage: {
+                        totalMinutes: 1,
+                        totalClicks: 0,
+                        totalRequests: 0
+                    }
+                };
+                doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $push: { 'userStatistics.calendar': newCalendarDay } }, { new: true });
+            }
+        }
+        else if (stat == 'totalDaysSinceRegistered') {
+            // TODO - How can days be counted if there may be days where the user would not log in at all
+        }
+        const updatedUser = await userModel.findById({ _id: req.params.id });
+        res.status(200).json(updatedUser);
+    }
+    else {
+        res.status(400);
+        throw new Error('Invalid user data - user was not found');
+    }
+});
+export const GetStat = expressAsyncHandler(async (req, res) => {
+    // const {email, password} = req.body;
+    const user = await userModel.findById({ _id: req.params.id });
+    if (user) {
+        const doc = await userModel.findOne({ $where: `this._id == ${req.params.id}` }, req.body);
         res.status(200).json(doc);
     }
     else {
