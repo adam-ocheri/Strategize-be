@@ -18,6 +18,6 @@ router.route("/:id")
     .delete(deleteUserById);
 //-----------------------------------------------------
 router.route("/stats")
-    .put(protectRoute, updateStat);
+    .post(protectRoute, updateStat);
 //TODO: authentication and associate User with Projects
 export default router;

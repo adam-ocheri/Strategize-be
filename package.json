@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "server": "tsc && nodemon index.js",
+    "start": "ts-node index.js",
+    "server": "nodemon index.js",
     "client": "npm start --prefix ../FE",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "tsc"

@@ -80,6 +80,7 @@ export const loginExistingUser = expressAsyncHandler(async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                userStatistics: user.userStatistics,
                 token: generateToken(user._id)
             });
         }
@@ -119,19 +120,26 @@ export const deleteUserById = expressAsyncHandler(async (req, res) => {
 const generateToken = (id) => {
     return JsonWebToken.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
-//!------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//!-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 export const updateStat = expressAsyncHandler(async (req, res) => {
     console.log('Stats Route is working!');
-    const user = await userModel.findById({ _id: req.params.id });
+    console.log(req.body);
+    const userId = req.query.id;
+    const user = await userModel.findById({ _id: req.query.id });
+    // res.json(user);
+    console.log(user);
+    console.log('user:');
     if (user) {
+        console.log('user IS VALID!!!!!');
         const { stat, targetValue } = req.body;
         let statString = `userStatistics.${stat}.${targetValue}`;
         let doc = {};
         if (stat == 'usageTracking' || stat == 'goalTracking') {
             console.log('STATS! :', { stat, targetValue });
-            doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $inc: { statString: 1 } });
+            doc = await userModel.findOneAndUpdate({ _id: userId }, { $inc: { [statString]: 1 } });
+            console.log(doc);
         }
         else if (stat == 'calendar') {
             const todayDate = new Date().toString().slice(0, 15);
@@ -146,7 +154,7 @@ export const updateStat = expressAsyncHandler(async (req, res) => {
             }
             if (found) {
                 statString = `userStatistics.${stat}.${at}.${targetValue}`;
-                doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $inc: { statString: 1 } });
+                doc = await userModel.findOneAndUpdate({ _id: userId }, { $inc: { [statString]: 1 } });
             }
             else {
                 const newCalendarDay = {
@@ -157,14 +165,17 @@ export const updateStat = expressAsyncHandler(async (req, res) => {
                         totalRequests: 0
                     }
                 };
-                doc = await userModel.updateOne({ $where: `this._id == ${req.params.id}` }, { $push: { 'userStatistics.calendar': newCalendarDay } }, { new: true });
+                doc = await userModel.findOneAndUpdate({ _id: userId }, { $push: { 'userStatistics.calendar': newCalendarDay } }, { new: true });
             }
         }
         else if (stat == 'totalDaysSinceRegistered') {
             // TODO - How can days be counted if there may be days where the user would not log in at all
         }
-        const updatedUser = await userModel.findById({ _id: req.params.id });
-        res.status(200).json(updatedUser);
+        const updatedUser = await userModel.findById(req.params.id);
+        res.status(200).json({
+            userStatistics: updatedUser.userStatistics,
+        });
+        //res.status(200).json(updatedUser)
     }
     else {
         res.status(400);

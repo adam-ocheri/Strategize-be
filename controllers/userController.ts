@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import expressAsyncHandler from 'express-async-handler/index.js';
-import mongoose from 'mongoose';
+import mongoose, { AnyKeys } from 'mongoose';
 import userModel from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
 import JsonWebToken  from 'jsonwebtoken';
@@ -96,6 +96,7 @@ export const loginExistingUser : RequestHandler = expressAsyncHandler(async (req
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                userStatistics: user.userStatistics,
                 token: generateToken(user._id)
             });
         }
@@ -146,25 +147,31 @@ const generateToken = (id) => {
 }
 
 
-//!------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//!-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //!------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const updateStat : RequestHandler = expressAsyncHandler(async (req:Request, res:Response) => {
     console.log('Stats Route is working!');
-
-    const user : any = await userModel.findById({_id: req.params.id});
-
+    console.log(req.body);
+    const userId = req.query.id;
+    const user : any = await userModel.findById({_id: req.query.id});
+    // res.json(user);
+    console.log(user);
+    console.log('user:')
     if(user)
     {
-        const { stat, targetValue} : any = req.body;
+        console.log('user IS VALID!!!!!');
 
-        let statString = `userStatistics.${stat}.${targetValue}`;
+        const { stat, targetValue } : any = req.body;
+
+        let statString : AnyKeys<string> = `userStatistics.${stat}.${targetValue}`;
         let doc : any = {};
 
-        if (stat == 'usageTracking' || stat == 'goalTracking'){
+        if (stat == 'usageTracking' || stat == 'goalTracking') {
             console.log('STATS! :', {stat, targetValue})
-            doc = await userModel.updateOne({$where: `this._id == ${req.params.id}`}, {$inc: {statString : 1}});
+            doc = await userModel.findOneAndUpdate({_id: userId}, {$inc: {[statString] : 1}});
+            console.log(doc);
         }
         else if (stat == 'calendar') {
             const todayDate = new Date().toString().slice(0, 15);
@@ -180,7 +187,7 @@ export const updateStat : RequestHandler = expressAsyncHandler(async (req:Reques
 
             if (found) {
                 statString = `userStatistics.${stat}.${at}.${targetValue}`;
-                doc = await userModel.updateOne({$where: `this._id == ${req.params.id}`}, {$inc: {statString : 1}});
+                doc = await userModel.findOneAndUpdate({_id: userId}, {$inc: {[statString] : 1}});
             }
             else {
                 const newCalendarDay = {
@@ -191,15 +198,18 @@ export const updateStat : RequestHandler = expressAsyncHandler(async (req:Reques
                         totalRequests: 0
                     }
                 }
-                doc = await userModel.updateOne({$where: `this._id == ${req.params.id}`}, { $push: { 'userStatistics.calendar': newCalendarDay }},{ new: true });  
+                doc = await userModel.findOneAndUpdate({_id: userId}, { $push: { 'userStatistics.calendar': newCalendarDay }},{ new: true });  
             }
         }
         else if (stat == 'totalDaysSinceRegistered') {
             // TODO - How can days be counted if there may be days where the user would not log in at all
         }
 
-        const updatedUser : any = await userModel.findById({_id: req.params.id});
-        res.status(200).json(updatedUser)
+        const updatedUser : any = await userModel.findById(req.params.id);
+        res.status(200).json({
+            userStatistics: updatedUser.userStatistics,
+        });
+        //res.status(200).json(updatedUser)
     }
     else
     {
